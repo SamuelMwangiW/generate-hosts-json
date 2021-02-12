@@ -1,0 +1,46 @@
+version: '3'
+services:
+  laravel.test:
+    build:
+      context: ./vendor/laravel/sail/runtimes/8.0
+      dockerfile: Dockerfile
+      args:
+        WWWGROUP: '${WWWGROUP}'
+    image: sail-8.0/app
+    ports:
+      - '8080:80'
+    environment:
+      WWWUSER: '${WWWUSER}'
+      LARAVEL_SAIL: 1
+    volumes:
+      - '.:/var/www/html'
+      - './supervisord.conf:/etc/supervisor/conf.d/supervisord.conf'
+    networks:
+      - sail
+    depends_on:
+      - mysql
+      - redis
+  mysql:
+    image: 'mariadb:10.5'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - '/tmp/hosts/mysql:/var/lib/mysql'
+    networks:
+      - sail
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping" ]
+  redis:
+    image: 'redis:alpine'
+    volumes:
+      - '/var/hosts/redis:/data'
+    networks:
+      - sail
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+networks:
+  sail:
