@@ -13,4 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/', 'welcome');
+Route::permanentRedirect('{any}', 'https://www.youtube.com/aschmelyun?sub_confirmation=1')
+    ->where('any', '.*');
