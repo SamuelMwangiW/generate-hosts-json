@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         foreach ($this->getOptions() as $option) {
-            $schedule->job(new FetchHosts($option))->everyMinute()
+            $schedule->job(new FetchHosts($option))->daily()
                 ->withoutOverlapping();
         }
     }
