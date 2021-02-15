@@ -10,15 +10,17 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use JetBrains\PhpStorm\Pure;
 
 class FetchHosts implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private string $url;
+    private string $recipe;
 
-    #[Pure] public function __construct(private string $recipe = ''){}
+    public function __construct(string $recipe = ''){
+        $this->recipe = $recipe;
+    }
 
     public function handle()
     {
@@ -29,8 +31,8 @@ class FetchHosts implements ShouldQueue
 
     private function getUrl(): string
     {
-        return match (Str::lower($this->recipe)) {
-            'fakenews' => 'alternates/fakenews/',
+        $recipes = [
+            'fakenews'=>'alternates/fakenews/',
             'gambling' => 'alternates/gambling/',
             'porn' => 'alternates/porn/',
             'social' => 'alternates/social/',
@@ -45,8 +47,9 @@ class FetchHosts implements ShouldQueue
             'fakenews-porn-social' => 'alternates/fakenews-porn-social/',
             'gambling-porn-social' => 'alternates/gambling-porn-social/',
             'fakenews-gambling-porn-social' => 'alternates/fakenews-gambling-porn-social/',
-            default => '',
-        };
+        ];
+
+        return $recipes[$this->recipe] ?? '';
     }
 
     private function downloadHosts(): string
